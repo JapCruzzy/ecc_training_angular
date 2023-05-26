@@ -1,0 +1,9 @@
+{
+  "/url": {
+    "target": "http://localhost:8080/",
+    "pathRewrite": {
+      "^/url": ""
+    },
+    "changeOrigin" : true
+  }
+}

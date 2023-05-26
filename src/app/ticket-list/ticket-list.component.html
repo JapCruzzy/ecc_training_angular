@@ -1,0 +1,281 @@
+<h2>{{ title }}</h2>
+<p-table [value]="ticket" dataKey="name" editMode="row">
+  <ng-template pTemplate="caption" class="p-inputgroup">
+    <!--    <input type="text" pInputText placeholder="Search by id" [(ngModel)]="id"/>-->
+    <!--    <button type="button" pButton label="Search"></button><br><br>-->
+    <p-button
+      class="btnAdd"
+      label="Add Ticket"
+      (onClick)="onTicketAdd()"
+    ></p-button>
+  </ng-template>
+
+  <ng-template pTemplate="header">
+    <tr>
+      <th>Ticket Number</th>
+      <th>Ticket Title</th>
+      <th>Description</th>
+      <th>Severity</th>
+      <th>Status</th>
+      <th>Assignee</th>
+      <th>Watchers</th>
+      <th>ACTIONS</th>
+    </tr>
+  </ng-template>
+  <ng-template
+    pTemplate="body"
+    let-rowData
+    let-editing="editing"
+    let-ri="rowIndex"
+  >
+    <tr [pEditableRow]="rowData">
+      <td>
+        {{ rowData.ticketNo }}
+      </td>
+      <td>
+        {{ rowData.title }}
+      </td>
+      <td>
+        {{ rowData.description }}
+      </td>
+      <td>
+        {{ rowData.severity }}
+      </td>
+      <td>
+        {{ rowData.status }}
+      <td>
+        {{ rowData.assignee?.employeeNumber}}
+      </td>
+      <td>
+        {{ rowData.watchers?.employeeNumber }}
+      </td>
+      <td style="text-align: center">
+        <p-button
+          class="btnAdd"
+          icon="pi pi-caret-right"
+          class="ui-button-info"
+          (onClick)="viewTicket(rowData)"
+        ></p-button>
+        <button
+          pButton
+          type="button"
+          icon="pi pi-pencil"
+          class="ui-button-info"
+          (click)="onTicketEdit(rowData)"
+        ></button>
+<!--        <p-confirmDialog [style]="{width: '60vw'}"></p-confirmDialog>-->
+<!--        <p-button (click)="confirm($event)" icon="pi pi-check" label="Confirm"></p-button>-->
+        <p-button
+          class="btnAdd"
+          icon="pi pi-trash"
+          class="ui-button-info"
+          styleClass="p-button-warning"
+          (onClick)="deleteTicket(rowData)"
+        ></p-button>
+      </td>
+    </tr>
+  </ng-template>
+</p-table>
+
+<!--View ticket Dialog-->
+<p-dialog
+  header="Ticket Data"
+  [(visible)]="displayViewDialog"
+  [breakpoints]="{'960px': '75vw', '640px': '100vw'}"
+  [style]="{width: '50vw'}">
+  Ticket Number: {{ticketViewDialog?.ticketNo}}<br>
+  Title: {{ticketViewDialog?.title}}<br>
+  Description: {{ticketViewDialog?.description}}<br>
+  Severity:{{ticketViewDialog?.severity}}<br>
+  Status: {{ticketViewDialog?.status}}<br>
+  Assignee: {{JSON.stringify(ticketViewDialog?.assignee?.employeeNumber)}}<br>
+  Watchers: {{JSON.stringify(ticketViewDialog?.watchers)}}<br>
+</p-dialog>
+
+<!--add ticket dialog-->
+<p-dialog
+  [(visible)]="displayDialog"
+  [modal]="true"
+  [responsive]="true"
+  [style]="{ height: '500vw'}"
+  header="Ticket details"
+  showEffect="fade"
+>
+  <form #addForm="ngForm" (ngSubmit)="saveTicket(addForm)" novalidate>
+    <div class="ui-grid ui-grid-responsive ui-fluid" *ngIf="addTicketDialog">
+      <div class="ui-g ui-g-12 ui-g-nopad">
+        <div class="ui-g-12 ui-md-3 ui-label">
+          <label for="title">Title</label>
+        </div>
+        <div class="ui-g-12 ui-md-9">
+          <input
+            pInputText
+            id="title"
+            name="title"
+            required
+            [(ngModel)]="addTicketDialog.title"
+          />
+        </div>
+      </div>
+      <div class="ui-g ui-g-12 ui-g-nopad">
+        <div class="ui-g-12 ui-md-3 ui-label">
+          <label for="description">Description</label>
+        </div>
+        <div class="ui-g-12 ui-md-9">
+          <input
+            pInputText
+            id="description"
+            name="description"
+            required
+            [(ngModel)]="addTicketDialog.description"
+          />
+        </div>
+      </div>
+      <div class="ui-g ui-g-12 ui-g-nopad">
+        <div class="ui-g-12 ui-md-3 ui-label">
+          <label for="severity">Severity</label>
+        </div>
+        <div class="p-float-label">
+          <p-dropdown [options]="severity" [(ngModel)]="addTicketDialog.severity"
+                      id="severity"
+                      name="severity"
+                      placeholder="Severity Level"
+                      optionLabel="name"
+                      optionValue="value">
+          </p-dropdown>
+
+        </div>
+      </div>
+      <div class="ui-g ui-g-12 ui-g-nopad">
+        <div class="ui-g-12 ui-md-3 ui-label">
+          <label for="status">Status</label>
+        </div>
+        <div class="p-float-label">
+          <p-dropdown [options]="status" [(ngModel)]="addTicketDialog.status"
+                      id="status"
+                      name="status"
+                      placeholder="Select a Department"
+                      optionLabel="name"
+                      optionValue="value">
+          </p-dropdown>
+
+        </div>
+      </div>
+    </div>
+    <p-footer>
+      <div class="ui-dialog-buttonpane ui-helper-clearfix">
+        <button type="button" pButton id="add-employee-form" icon="fa-check" data-dismiss="modal">Close
+        </button>
+        <button
+          type="submit"
+          pButton
+          icon="fa-check"
+          label="Save"
+          [disabled]="addForm.form.invalid"
+        ></button>
+      </div>
+    </p-footer>
+  </form>
+</p-dialog>
+
+<!--update ticket dialog-->
+<p-dialog
+  [(visible)]="displayEditDialog"
+  [modal]="true"
+  [responsive]="true"
+  [style]="{ height: '500vw'}"
+  header="Ticket details"
+  showEffect="fade"
+>
+  <form #editForm="ngForm">
+    <div class="ui-grid ui-grid-responsive ui-fluid" *ngIf="ticketEditDialog">
+      <div class="ui-g ui-g-12 ui-g-nopad">
+        <div class="ui-g-12 ui-md-3 ui-label">
+          <label for="tickNo">Ticket Number</label>
+        </div>
+        <div class="ui-g-12 ui-md-9">
+          <input
+            pInputText
+            id="tickNo"
+            name="tickNo"
+            disabled
+            [(ngModel)]="ticketEditDialog.ticketNo"
+          />
+        </div>
+      </div>
+      <div class="ui-g ui-g-12 ui-g-nopad">
+        <div class="ui-g-12 ui-md-3 ui-label">
+          <label for="titles">Title</label>
+        </div>
+        <div class="ui-g-12 ui-md-9">
+          <input
+            pInputText
+            id="titles"
+            name="titles"
+            required
+            [(ngModel)]="ticketEditDialog.title"
+          />
+        </div>
+      </div>
+      <div class="ui-g ui-g-12 ui-g-nopad">
+        <div class="ui-g-12 ui-md-3 ui-label">
+          <label for="desc">Description</label>
+        </div>
+        <div class="ui-g-12 ui-md-9">
+          <input
+            pInputText
+            id="desc"
+            name="desc"
+            required
+            [(ngModel)]="ticketEditDialog.description"
+          />
+        </div>
+      </div>
+      <div class="ui-g ui-g-12 ui-g-nopad">
+        <div class="ui-g-12 ui-md-3 ui-label">
+          <label for="severity1">Severity</label>
+        </div>
+        <div class="p-float-label">
+          <p-dropdown [options]="severity" [(ngModel)]="ticketEditDialog.severity"
+                      id="severity1"
+                      name="severity1"
+                      placeholder="{{ticketEditDialog.severity}}"
+                      optionLabel="name"
+                      optionValue="value">
+          </p-dropdown>
+
+        </div>
+      </div>
+      <div class="ui-g ui-g-12 ui-g-nopad">
+        <div class="ui-g-12 ui-md-3 ui-label">
+          <label for="state">Status</label>
+        </div>
+        <div class="p-float-label">
+          <p-dropdown [options]="status" [(ngModel)]="ticketEditDialog.status"
+                      id="state"
+                      name="state"
+                      placeholder="{{ticketEditDialog.status}}"
+                      optionLabel="name"
+                      optionValue="value">
+          </p-dropdown>
+
+        </div>
+      </div>
+    </div>
+  </form>
+  <p-footer>
+    <div class="ui-dialog-buttonpane ui-helper-clearfix">
+      <button type="button" pButton id="edit-employee-form" icon="fa-check" data-dismiss="modal">Close
+      </button>
+      <button
+        (click)="onRowEditSave(ticketEditDialog)"
+        type="submit"
+        pButton
+        icon="fa-check"
+        label="Save"
+        [disabled]="!editForm.form.valid"
+      ></button>
+    </div>
+  </p-footer>
+
+</p-dialog>
