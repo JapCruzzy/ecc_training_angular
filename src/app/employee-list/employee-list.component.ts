@@ -3,6 +3,7 @@ import { Employee } from "../Employee";
 import {EmployeeService} from "../employee.service";
 import {NgForm} from "@angular/forms";
 import {Ticket} from "../Ticket";
+import {TicketService} from "../ticket.service";
 
 
 @Component({
@@ -14,8 +15,6 @@ export class EmployeeListComponent implements OnInit {
   title = "Employee Management"
   employee: Employee[];
   ticket: Ticket[];
-  assignee: Ticket[];
-  watchers: Employee[];
   departments: any = [
     { name: 'IT', value: 0 },
     { name: 'ADMIN', value: 1 },
@@ -33,13 +32,13 @@ export class EmployeeListComponent implements OnInit {
 
   };
   displayViewDialog: boolean;
-  employeeViewDialog: {
-    id: number;
-    firstName: string;
-    lastName: string;
-    middleName: string;
-    department: string;
-    employeeNumber: number;
+  employeeViewDialog: Employee = {
+    id: 0,
+    firstName: "",
+    lastName: "",
+    middleName: "",
+    department: "",
+    employeeNumber: 0
   }
 
   displayEditDialog: boolean;
@@ -52,17 +51,18 @@ export class EmployeeListComponent implements OnInit {
     employeeNumber: 0
   }
 
-  displayAssignDialog: boolean;
-  employeeAssignDialog: {
-    assignee: Ticket[]
-    watchers: Employee[]
-  }
-
-  constructor(private employeeService: EmployeeService) {}
+  constructor(private employeeService: EmployeeService, private ticketService: TicketService) {}
   ngOnInit(): void {
     this.employeeService
       .getEmployee()
       .subscribe((employees) => (this.employee = employees));
+  }
+
+  ngOnInitTicket(): void {
+    this.ticketService
+      .getTicket()
+      .subscribe((tickets) => (this.ticket = tickets))
+
   }
 
   onEmployeeAdd() {
@@ -89,21 +89,16 @@ export class EmployeeListComponent implements OnInit {
     this.displayDialog = false;
   }
 
-  clonedBooks: { [s: string]: Employee } = {};
+  // clonedBooks: { [s: string]: Employee } = {};
   // onRowEditInit(employee: Employee) {
   //   console.log('Row edit initialized');
   //   this.clonedBooks[employee.id] = { ...employee };
   // }
 
+
+
   onEmployeeEdit(employee: Employee) {
-    this.employeeEditDialog = {
-      id: employee.id,
-      employeeNumber: employee.employeeNumber,
-      firstName: employee.firstName,
-      middleName: employee.middleName,
-      lastName: employee.lastName,
-      department: employee.department
-    };
+    this.employeeEditDialog = employee;
     this.displayEditDialog = true;
   }
   onRowEditSave(employee: Employee) {
@@ -138,20 +133,4 @@ export class EmployeeListComponent implements OnInit {
       });
 
   }
-
-  // onAssignTicketToEmployee(ticket: Ticket[]) {
-  //   this.employeeService
-  //     .assignTicketToEmployee({ ticket: ticket })
-  //     .subscribe((data) => {
-  //       this.displayAssignDialog = true;
-  //       this.employeeAssignDialog.assignee = this.assignee;
-  //       this.employeeAssignDialog.watchers = this.watchers
-  //
-  //       console.log(data);
-  //
-  //     });
-  //
-  // }
-
-
 }

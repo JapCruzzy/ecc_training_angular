@@ -90,6 +90,18 @@
   Status: {{ticketViewDialog?.status}}<br>
   Assignee: {{JSON.stringify(ticketViewDialog?.assignee?.employeeNumber)}}<br>
   Watchers: {{JSON.stringify(ticketViewDialog?.watchers)}}<br>
+
+  <p-footer>
+    <div class="ui-dialog-buttonpane ui-helper-clearfix">
+      <button type="button" (click)="onClose()" pButton id="view-employee-form" icon="fa-check" data-dismiss="modal">Close
+      </button>
+      <p-button
+        class="btnAdd"
+        label="Assign Ticket"
+        (onClick)="onAssignTicketDialog()"
+      ></p-button>
+    </div>
+  </p-footer>
 </p-dialog>
 
 <!--add ticket dialog-->
@@ -164,7 +176,7 @@
     </div>
     <p-footer>
       <div class="ui-dialog-buttonpane ui-helper-clearfix">
-        <button type="button" pButton id="add-employee-form" icon="fa-check" data-dismiss="modal">Close
+        <button type="button" (click)="onClose()" pButton id="add-employee-form" icon="fa-check" data-dismiss="modal">Close
         </button>
         <button
           type="submit"
@@ -265,7 +277,7 @@
   </form>
   <p-footer>
     <div class="ui-dialog-buttonpane ui-helper-clearfix">
-      <button type="button" pButton id="edit-employee-form" icon="fa-check" data-dismiss="modal">Close
+      <button type="button" (click)="onClose()" pButton id="edit-employee-form" icon="fa-check" data-dismiss="modal">Close
       </button>
       <button
         (click)="onRowEditSave(ticketEditDialog)"
@@ -278,4 +290,52 @@
     </div>
   </p-footer>
 
+</p-dialog>
+
+<!--Employee assign ticket DIALOG-->
+<p-dialog
+  header="Assign Ticket"
+  id="assignTicketModal"
+  [modal]="true"
+  [(visible)]="displayAssignDialog"
+  [breakpoints]="{'960px': '75vw', '640px': '100vw'}"
+  [style]="{width: '50vw'}">
+  <form #assignForm="ngForm">
+    <div class="card flex justify-content-center">
+      <div class="flex flex-column gap-2">
+        <label>Select an Assignee: </label><br>
+        <!--                  <p-dropdown [options]="tickets"-->
+        <!--                              [(ngModel)]="selectedTicket"-->
+        <!--                              placeholder="Select a City"-->
+        <!--                              optionLabel="tickets.ticketNo: tickets.title"-->
+        <!--                              ></p-dropdown>-->
+        <select id="tickets" name="Assignee" [(ngModel)]="selectedAssignee" (ngModelChange)="onSelectedEmployee()" placeholder="Select">
+          <option>----Select-----</option>
+          <option *ngFor="let employees of employee" [value]="employees.employeeNumber">
+            {{employees.firstName}} {{employees.lastName}}
+          </option>
+        </select><br><br>
+
+        <label>Select Watchers: </label><br>
+        <div *ngFor="let employees of employee">
+          <p-checkbox name="group" [value]="employees.employeeNumber.toString()" [(ngModel)]="selectedWatchers" (ngModelChange)="onSelectedWatcher()" inputId="binary">
+            {{employees.firstName}} {{employees.lastName}}</p-checkbox>
+          <label [for]="employees.employeeNumber">{{employees.firstName}} {{employees.lastName}}</label>
+        </div>
+
+      </div>
+    </div>
+  </form>
+  <p-footer>
+    <div class="ui-dialog-buttonpane ui-helper-clearfix">
+      <button
+        (click)="onAssignTicket(employeeAssignDialog, selectedAssignee, selectedWatchers)"
+        type="submit"
+        pButton
+        icon="fa-check"
+        label="Confirm"
+        [disabled]="!assignForm.form.valid"
+      ></button>
+    </div>
+  </p-footer>
 </p-dialog>

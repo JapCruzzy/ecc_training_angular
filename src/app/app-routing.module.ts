@@ -1,15 +1,15 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from "@angular/router";
 import {EmployeeListComponent} from "./employee-list/employee-list.component";
-import {DashboardComponent} from "./dashboard/dashboard.component";
 import {TicketListComponent} from "./ticket-list/ticket-list.component";
 
 const routes: Routes = [
 
   { path: '', redirectTo: 'employees/list', pathMatch: 'full' },
   { path: 'employees/list', component: EmployeeListComponent },
-  { path: 'tickets/list', component: TicketListComponent }
+  { path: 'employees/:id', component: EmployeeListComponent },
+  { path: 'tickets/list', component: TicketListComponent },
+  { path: 'tickets/:id', component: TicketListComponent }
 ];
 
 @NgModule({

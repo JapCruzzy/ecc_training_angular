@@ -1,4 +1,4 @@
-<h2>{{ title }}</h2>
+<h2 xmlns="http://www.w3.org/1999/html">{{ title }}</h2>
 <p-table [value]="employee" dataKey="name" editMode="row">
   <ng-template pTemplate="caption" class="p-inputgroup">
     <!--    <input type="text" pInputText placeholder="Search by id" [(ngModel)]="id"/>-->
@@ -24,8 +24,6 @@
   <ng-template
     pTemplate="body"
     let-rowData
-    let-editing="editing"
-    let-ri="rowIndex"
   >
     <tr [pEditableRow]="rowData">
       <td>
@@ -70,12 +68,10 @@
     </tr>
   </ng-template>
 </p-table>
-
 <!--Employee View Dialog-->
 <p-dialog
   header="Employee Data"
   id="viewEmployeeModal"
-  [responsive]="true"
   [modal]="true"
   [(visible)]="displayViewDialog"
   [breakpoints]="{'960px': '75vw', '640px': '100vw'}"
@@ -86,27 +82,16 @@
   Last Name: {{employeeViewDialog?.lastName}}<br>
   Department: {{employeeViewDialog?.department}}<br>
 
-  <!--  <ng-template pTemplate="caption" class="p-inputgroup">-->
-  <!--    &lt;!&ndash;    <input type="text" pInputText placeholder="Search by id" [(ngModel)]="id"/>&ndash;&gt;-->
-  <!--    &lt;!&ndash;    <button type="button" pButton label="Search"></button><br><br>&ndash;&gt;-->
-  <!--    <p-button-->
-  <!--      class="btnAdd"-->
-  <!--      label="Assign Ticket"-->
-  <!--      (onClick)="onAssignTicketToEmployee(ticket)"-->
-  <!--    ></p-button>-->
-  <!--  </ng-template>-->
 </p-dialog>
-
 <!--Employee Add DIALOG-->
 <p-dialog
   [(visible)]="displayDialog"
   [modal]="true"
-  [responsive]="true"
   [style]="{ height: '300vw'}"
   header="Ticket details"
   showEffect="fade"
 >
-  <form #addForm="ngForm" (ngSubmit)="saveEmployee(addForm)">
+  <form #addForm="ngForm">
     <div class="ui-grid ui-grid-responsive ui-fluid" *ngIf="employeeDialog">
       <div class="ui-g ui-g-12 ui-g-nopad">
         <div class="ui-g-12 ui-md-3 ui-label">
@@ -184,6 +169,7 @@
       <button type="button" pButton id="add-employee-form" icon="fa-check" data-dismiss="modal">Close
       </button>
       <button
+        (click)="saveEmployee(addForm)"
         type="submit"
         pButton
         icon="fa-check"
@@ -198,7 +184,6 @@
 <p-dialog
   [(visible)]="displayEditDialog"
   [modal]="true"
-  [responsive]="true"
   [style]="{ height: '500vw'}"
   header="Ticket details"
   showEffect="fade"
@@ -280,30 +265,7 @@
   </p-footer>
 
 </p-dialog>
-<!--Employee assign ticket DIALOG-->
-<!--<p-dialog-->
-<!--  header="Assign Ticket"-->
-<!--  id="assignTicketModal"-->
-<!--  [responsive]="true"-->
-<!--  [modal]="true"-->
-<!--  [(visible)]="displayAssignDialog"-->
-<!--  [breakpoints]="{'960px': '75vw', '640px': '100vw'}"-->
-<!--  [style]="{width: '50vw'}">-->
 
-<!--  <ng-template pTemplate="caption" class="p-inputgroup">-->
-<!--    <div class="p-float-label">-->
-<!--      <p-dropdown [options] = "assignee"-->
-<!--                  id="ticket"-->
-<!--                  name="ticket"-->
-<!--                  placeholder="Select a Ticket"-->
-<!--                  optionLabel="name"-->
-<!--                  optionValue="assignee.title">-->
-<!--      </p-dropdown>-->
-<!--&lt;!&ndash;    <p-button&ndash;&gt;-->
-<!--&lt;!&ndash;      class="btnAdd"&ndash;&gt;-->
-<!--&lt;!&ndash;      label="Assign Ticket"&ndash;&gt;-->
-<!--&lt;!&ndash;      (onClick)="onAssignTicketToEmployee(ticket)"&ndash;&gt;-->
-<!--&lt;!&ndash;    ></p-button>&ndash;&gt;-->
-<!--    </div>-->
-<!--  </ng-template>-->
-<!--</p-dialog>-->
+
+
+

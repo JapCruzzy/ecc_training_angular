@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from "@angular/common/http";
+import {HttpClient, HttpParams} from "@angular/common/http";
 import { Employee } from "./Employee";
 import {Ticket} from "./Ticket";
 import {Observable} from "rxjs";
@@ -39,9 +39,19 @@ export class EmployeeService {
     );
   }
 
-  public assignTicketToEmployee({ ticket }: { ticket: Ticket }) : Observable<Ticket>{
+  public assignTicketToEmployee(ticketNo: number, employeeId: any) : Observable<Ticket>{
     return this.http.put<Ticket>(
-      `/url/api/employees/assign-ticket/${ticket.ticketNo}`, ticket
+      `/url/api/employees/assign-ticket/${ticketNo}?employeeNumber=${employeeId}`, employeeId
+    );
+  }
+
+  public assignTicketWatchers(ticketNo: number,  watchers: any[] ) : Observable<Ticket>{
+    let params = new HttpParams();
+    for (const watcher of watchers){
+      params = params.append('employeeNumber', watcher)
+    }
+    return this.http.put<Ticket>(
+      `/url/api/employees/add-watchers/${ticketNo}?${params}`, watchers
     );
   }
 
