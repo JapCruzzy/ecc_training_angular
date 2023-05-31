@@ -1,5 +1,5 @@
 <h2>{{ title }}</h2>
-<p-table [value]="ticket" dataKey="name" editMode="row">
+<p-table [value]="ticket" dataKey="name" editMode="row" styleClass="p-datatable-striped">
   <ng-template pTemplate="caption" class="p-inputgroup">
     <!--    <input type="text" pInputText placeholder="Search by id" [(ngModel)]="id"/>-->
     <!--    <button type="button" pButton label="Search"></button><br><br>-->
@@ -12,11 +12,11 @@
 
   <ng-template pTemplate="header">
     <tr>
-      <th>Ticket Number</th>
-      <th>Ticket Title</th>
-      <th>Description</th>
-      <th>Severity</th>
-      <th>Status</th>
+      <th pSortableColumn="ticketNo" style="width:10%">Ticket Number<p-sortIcon field="ticketNo"></p-sortIcon></th>
+      <th pSortableColumn="title" style="width:10%">Ticket Title<p-sortIcon field="title"></p-sortIcon></th>
+      <th pSortableColumn="description" style="width:10%">Description<p-sortIcon field="description"></p-sortIcon></th>
+      <th pSortableColumn="severity" style="width:10%">Severity<p-sortIcon field="severity"></p-sortIcon></th>
+      <th pSortableColumn="status" style="width:10%">Status<p-sortIcon field="status"></p-sortIcon></th>
       <th>Assignee</th>
       <th>Watchers</th>
       <th>ACTIONS</th>
@@ -47,11 +47,12 @@
         {{ rowData.assignee?.employeeNumber}}
       </td>
       <td>
-        {{ rowData.watchers?.employeeNumber }}
+        <ng-container *ngFor="let watchers of rowData.watchers">
+          {{ watchers?.employeeNumber}}
+        </ng-container>
       </td>
       <td style="text-align: center">
         <p-button
-          class="btnAdd"
           icon="pi pi-caret-right"
           class="ui-button-info"
           (onClick)="viewTicket(rowData)"
@@ -63,10 +64,9 @@
           class="ui-button-info"
           (click)="onTicketEdit(rowData)"
         ></button>
-<!--        <p-confirmDialog [style]="{width: '60vw'}"></p-confirmDialog>-->
-<!--        <p-button (click)="confirm($event)" icon="pi pi-check" label="Confirm"></p-button>-->
+        <!--        <p-confirmDialog [style]="{width: '60vw'}"></p-confirmDialog>-->
+        <!--        <p-button (click)="confirm($event)" icon="pi pi-check" label="Confirm"></p-button>-->
         <p-button
-          class="btnAdd"
           icon="pi pi-trash"
           class="ui-button-info"
           styleClass="p-button-warning"
@@ -83,17 +83,49 @@
   [(visible)]="displayViewDialog"
   [breakpoints]="{'960px': '75vw', '640px': '100vw'}"
   [style]="{width: '50vw'}">
-  Ticket Number: {{ticketViewDialog?.ticketNo}}<br>
-  Title: {{ticketViewDialog?.title}}<br>
-  Description: {{ticketViewDialog?.description}}<br>
-  Severity:{{ticketViewDialog?.severity}}<br>
-  Status: {{ticketViewDialog?.status}}<br>
-  Assignee: {{JSON.stringify(ticketViewDialog?.assignee?.employeeNumber)}}<br>
-  Watchers: {{JSON.stringify(ticketViewDialog?.watchers)}}<br>
+  <div class="ui-g ui-g-12 ui-g-nopad">
+    <div class="ui-g-12 ui-md-3 ui-label">
+      <label>Ticket Number: {{ticketViewDialog?.ticketNo}}</label>
+    </div>
+  </div>
+  <div class="ui-g ui-g-12 ui-g-nopad">
+    <div class="ui-g-12 ui-md-3 ui-label">
+      <label>Title: {{ticketViewDialog?.title}}</label>
+    </div>
+  </div>
+  <div class="ui-g ui-g-12 ui-g-nopad">
+    <div class="ui-g-12 ui-md-3 ui-label">
+      <label>Description: {{ticketViewDialog?.description}}</label>
+    </div>
+  </div>
+  <div class="ui-g ui-g-12 ui-g-nopad">
+    <div class="ui-g-12 ui-md-3 ui-label">
+      <label>Severity:{{ticketViewDialog?.severity}}</label>
+    </div>
+  </div>
+  <div class="ui-g ui-g-12 ui-g-nopad">
+    <div class="ui-g-12 ui-md-3 ui-label">
+      <label>Status: {{ticketViewDialog?.status}}</label>
+    </div>
+  </div>
+  <div class="ui-g ui-g-12 ui-g-nopad">
+    <div class="ui-g-12 ui-md-3 ui-label">
+      <label>Assignee: {{ticketViewDialog?.assignee?.employeeNumber}}</label>
+    </div>
+  </div>
+  <div class="ui-g ui-g-12 ui-g-nopad">
+    <div class="ui-g-12 ui-md-3 ui-label">
+      <label>Watchers: </label>
+      <ng-container *ngFor="let watchers of ticketViewDialog.watchers">
+        {{watchers?.firstName}} {{watchers?.lastName}},
+      </ng-container>
+    </div>
+  </div>
 
   <p-footer>
     <div class="ui-dialog-buttonpane ui-helper-clearfix">
-      <button type="button" (click)="onClose()" pButton id="view-employee-form" icon="fa-check" data-dismiss="modal">Close
+      <button type="button" (click)="onClose()" pButton id="view-employee-form" icon="fa-check" data-dismiss="modal">
+        Close
       </button>
       <p-button
         class="btnAdd"
@@ -109,11 +141,12 @@
   [(visible)]="displayDialog"
   [modal]="true"
   [responsive]="true"
-  [style]="{ height: '500vw'}"
+  [breakpoints]="{'960px': '75vw', '640px': '100vw'}"
+  [style]="{width: '50vw', 'position':'absolute'}"
   header="Ticket details"
   showEffect="fade"
 >
-  <form #addForm="ngForm" (ngSubmit)="saveTicket(addForm)" novalidate>
+  <form #addForm="ngForm" novalidate>
     <div class="ui-grid ui-grid-responsive ui-fluid" *ngIf="addTicketDialog">
       <div class="ui-g ui-g-12 ui-g-nopad">
         <div class="ui-g-12 ui-md-3 ui-label">
@@ -149,6 +182,7 @@
         </div>
         <div class="p-float-label">
           <p-dropdown [options]="severity" [(ngModel)]="addTicketDialog.severity"
+                      appendTo="body"
                       id="severity"
                       name="severity"
                       placeholder="Severity Level"
@@ -168,26 +202,29 @@
                       name="status"
                       placeholder="Select a Department"
                       optionLabel="name"
-                      optionValue="value">
+                      optionValue="value"
+                      [disabled]=true>
           </p-dropdown>
 
         </div>
       </div>
     </div>
+  </form>
     <p-footer>
       <div class="ui-dialog-buttonpane ui-helper-clearfix">
-        <button type="button" (click)="onClose()" pButton id="add-employee-form" icon="fa-check" data-dismiss="modal">Close
+        <button type="button" (click)="onClose()" pButton id="add-employee-form" icon="fa-check" data-dismiss="modal">
+          Close
         </button>
         <button
           type="submit"
           pButton
           icon="fa-check"
           label="Save"
+          (click)="saveTicket(addForm)"
           [disabled]="addForm.form.invalid"
         ></button>
       </div>
     </p-footer>
-  </form>
 </p-dialog>
 
 <!--update ticket dialog-->
@@ -277,7 +314,8 @@
   </form>
   <p-footer>
     <div class="ui-dialog-buttonpane ui-helper-clearfix">
-      <button type="button" (click)="onClose()" pButton id="edit-employee-form" icon="fa-check" data-dismiss="modal">Close
+      <button type="button" (click)="onClose()" pButton id="edit-employee-form" icon="fa-check" data-dismiss="modal">
+        Close
       </button>
       <button
         (click)="onRowEditSave(ticketEditDialog)"
@@ -294,7 +332,7 @@
 
 <!--Employee assign ticket DIALOG-->
 <p-dialog
-  header="Assign Ticket"
+  header="Assign Ticket: {{employeeAssignDialog.title}}"
   id="assignTicketModal"
   [modal]="true"
   [(visible)]="displayAssignDialog"
@@ -309,7 +347,8 @@
         <!--                              placeholder="Select a City"-->
         <!--                              optionLabel="tickets.ticketNo: tickets.title"-->
         <!--                              ></p-dropdown>-->
-        <select id="tickets" name="Assignee" [(ngModel)]="selectedAssignee" (ngModelChange)="onSelectedEmployee()" placeholder="Select">
+        <select id="tickets" name="Assignee" [(ngModel)]="selectedAssignee"
+                 placeholder="Select">
           <option>----Select-----</option>
           <option *ngFor="let employees of employee" [value]="employees.employeeNumber">
             {{employees.firstName}} {{employees.lastName}}
@@ -318,7 +357,9 @@
 
         <label>Select Watchers: </label><br>
         <div *ngFor="let employees of employee">
-          <p-checkbox name="group" [value]="employees.employeeNumber.toString()" [(ngModel)]="selectedWatchers" (ngModelChange)="onSelectedWatcher()" inputId="binary">
+          <p-checkbox name="group" [value]="employees.employeeNumber.toString()"
+                      [(ngModel)]="selectedWatchers"
+                      inputId="binary">
             {{employees.firstName}} {{employees.lastName}}</p-checkbox>
           <label [for]="employees.employeeNumber">{{employees.firstName}} {{employees.lastName}}</label>
         </div>
@@ -329,7 +370,7 @@
   <p-footer>
     <div class="ui-dialog-buttonpane ui-helper-clearfix">
       <button
-        (click)="onAssignTicket(employeeAssignDialog, selectedAssignee, selectedWatchers)"
+        (click)="onAssignTicket(employeeAssignDialog, selectedAssignee, selectedWatchers, assignForm)"
         type="submit"
         pButton
         icon="fa-check"

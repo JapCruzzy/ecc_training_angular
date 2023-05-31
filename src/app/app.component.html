@@ -1,10 +1,11 @@
-<h1>{{ title }}</h1>
-<div>
-<!--  <app-employee-list></app-employee-list>-->
-<!--  <app-ticket-list></app-ticket-list>-->
-  <nav>
-    <a pButton routerLink="/employees/list">Employees</a>
-    <a pButton routerLink="/tickets/list">Tickets</a>
-  </nav>
-  <router-outlet></router-outlet>
+<div class="card flex justify-content-center">
+  <p-card header="{{title}}">
+    <nav>
+      <a pButton routerLink="/employees/list">Employees</a>
+      <a pButton routerLink="/tickets/list">Tickets</a>
+    </nav>
+    <router-outlet></router-outlet>
+
+  </p-card>
+
 </div>

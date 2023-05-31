@@ -1,9 +1,10 @@
 import {Component, OnInit} from '@angular/core';
-import { Employee } from "../Employee";
+import {Employee} from "../Employee";
 import {EmployeeService} from "../employee.service";
 import {NgForm} from "@angular/forms";
 import {Ticket} from "../Ticket";
 import {TicketService} from "../ticket.service";
+import {HttpErrorResponse} from "@angular/common/http";
 
 
 @Component({
@@ -51,18 +52,11 @@ export class EmployeeListComponent implements OnInit {
     employeeNumber: 0
   }
 
-  constructor(private employeeService: EmployeeService, private ticketService: TicketService) {}
+  constructor(private employeeService: EmployeeService) {}
   ngOnInit(): void {
     this.employeeService
       .getEmployee()
       .subscribe((employees) => (this.employee = employees));
-  }
-
-  ngOnInitTicket(): void {
-    this.ticketService
-      .getTicket()
-      .subscribe((tickets) => (this.ticket = tickets))
-
   }
 
   onEmployeeAdd() {
@@ -84,7 +78,10 @@ export class EmployeeListComponent implements OnInit {
         this.ngOnInit();
         alert('Employee Created successfully.');
         addForm.reset();
-      });
+      },
+        (error : HttpErrorResponse) => {
+          alert(error.message);
+        });
 
     this.displayDialog = false;
   }
@@ -109,7 +106,10 @@ export class EmployeeListComponent implements OnInit {
         this.employeeEditDialog = data;
         this.ngOnInit();
         alert('Employee Updated successfully.');
-      });
+      },
+        (error : HttpErrorResponse) => {
+          alert(error.message);
+        });
     this.displayEditDialog = false;
   }
   deleteEmployee(employee: Employee) {
@@ -120,7 +120,10 @@ export class EmployeeListComponent implements OnInit {
       .subscribe((data) => {
         this.ngOnInit();
         alert('Employee Deleted successfully.');
-      });
+      },
+        error => {
+          alert(error.status + ": Cannot delete employee when still have tickets assigned");
+        });
   }
 
   viewEmployee(employee: Employee) {
@@ -130,7 +133,10 @@ export class EmployeeListComponent implements OnInit {
         this.displayViewDialog = true;
         this.employeeViewDialog = data;
         console.log(data);
-      });
+      },
+        (error : HttpErrorResponse) => {
+          alert(error.message);
+        });
 
   }
 }

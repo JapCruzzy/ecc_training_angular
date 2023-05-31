@@ -19,31 +19,34 @@ import {InputTextModule} from "primeng/inputtext";
 import {ConfirmDialogModule} from "primeng/confirmdialog";
 import { AppRoutingModule } from './app-routing.module';
 import {CheckboxModule} from "primeng/checkbox";
+import {CardModule} from "primeng/card";
 
 @NgModule({
   declarations: [
     AppComponent,
     EmployeeListComponent,
     TicketListComponent,
-    DashboardComponent
+    DashboardComponent,
+
   ],
-    imports: [
-        HttpClientModule,
-        RouterModule.forRoot([]),
-        BrowserModule,
-        TabMenuModule,
-        TableModule,
-        FormsModule,
-        ButtonModule,
-        DialogModule,
-        BrowserAnimationsModule,
-        DropdownModule,
-        InputMaskModule,
-        InputTextModule,
-        ConfirmDialogModule,
-        AppRoutingModule,
-        CheckboxModule,
-    ],
+  imports: [
+    HttpClientModule,
+    RouterModule.forRoot([]),
+    BrowserModule,
+    TabMenuModule,
+    TableModule,
+    FormsModule,
+    ButtonModule,
+    DialogModule,
+    BrowserAnimationsModule,
+    DropdownModule,
+    InputMaskModule,
+    InputTextModule,
+    ConfirmDialogModule,
+    AppRoutingModule,
+    CheckboxModule,
+    CardModule,
+  ],
   providers: [],
   bootstrap: [AppComponent]
 })

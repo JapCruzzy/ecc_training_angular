@@ -4,7 +4,7 @@ import {TicketService} from "../ticket.service";
 import {NgForm} from "@angular/forms";
 import {Employee} from "../Employee";
 import {EmployeeService} from "../employee.service";
-import {forkJoin} from "rxjs";
+import {HttpErrorResponse} from "@angular/common/http";
 
 
 @Component({
@@ -25,18 +25,15 @@ export class TicketListComponent implements OnInit {
   ]
 
   status: any = [
-    {name: 'NEW', value: 0},
-    {name: 'ASSIGNED', value: 1},
     {name: 'IN PROGRESS', value: 2},
     {name: 'CLOSED', value: 3}
   ]
   displayDialog: boolean;
   addTicketDialog: {
-    ticketNo: 0,
     title: "",
     description: "",
     severity: "",
-    status: ""
+    status: 0
 
   };
 
@@ -52,10 +49,18 @@ export class TicketListComponent implements OnInit {
   }
 
   displayViewDialog: boolean;
-  ticketViewDialog: Ticket
+  ticketViewDialog: Ticket = {
+    ticketNo: 0,
+    title: "",
+    description: "",
+    severity: "",
+    status: "",
+    assignee: null,
+    watchers: []
+  }
 
   selectedAssignee: number;
-  selectedWatchers: number[] = [];
+  selectedWatchers?: number[];
   displayAssignDialog: boolean;
   employeeAssignDialog: Ticket = {
     description: "",
@@ -84,11 +89,10 @@ export class TicketListComponent implements OnInit {
 
   onTicketAdd() {
     this.addTicketDialog = {
-      ticketNo: 0,
       title: "",
       description: "",
       severity: "",
-      status: ""
+      status: 0
     };
     this.displayDialog = true;
   }
@@ -101,7 +105,10 @@ export class TicketListComponent implements OnInit {
         this.ngOnInit();
         alert('Ticket Created successfully.');
         addForm.reset();
-      });
+      },
+        (error : HttpErrorResponse) => {
+          alert(error.message);
+        });
 
     this.displayDialog = false;
   }
@@ -119,7 +126,10 @@ export class TicketListComponent implements OnInit {
         this.ticketEditDialog = data;
         this.ngOnInit();
         alert('Employee Updated successfully.');
-      });
+      },
+        (error : HttpErrorResponse) => {
+          alert(error.message);
+        });
     this.displayEditDialog = false;
   }
 
@@ -131,7 +141,10 @@ export class TicketListComponent implements OnInit {
       .subscribe((data) => {
         this.ngOnInit();
         alert('Ticket Deleted successfully.');
-      });
+      }),
+      (error : HttpErrorResponse) => {
+        alert(error.message);
+      };
   }
 
   // confirm(event: Event, ticket: Ticket) {
@@ -170,8 +183,10 @@ export class TicketListComponent implements OnInit {
         console.log(this.employeeAssignDialog.assignee);
         this.ngOnInit();
         // alert(`Ticket assigned to ${data.assignee.employeeNumber}`);
-        this.displayAssignDialog = false;
-      });
+      },
+        error => {
+        alert(error.status + ": Please select an assignee")
+        });
 
   }
 
@@ -181,17 +196,21 @@ export class TicketListComponent implements OnInit {
       .assignTicketWatchers(ticket.ticketNo, watchers)
       .subscribe((data) => {
         this.employeeAssignDialog = data;
-        console.log(this.employeeAssignDialog.watchers);
-        console.log(data);
+        this.ngOnInit();
       });
   }
 
-  onAssignTicket(ticket: Ticket, employeeId: number, watchers: number[]) {
+  onAssignTicket(ticket: Ticket, employeeId: number, watchers: any[], assignForm: NgForm) {
     this.onAssignTicketToEmployee(ticket, employeeId);
+    this.employeeAssignDialog = this.ticketViewDialog;
     if (watchers.length > 0) {
-      this.onAssignWatchers(ticket, watchers);
+      let newWatcher = watchers.map(Number);
+      this.onAssignWatchers(ticket, newWatcher);
     }
     alert("Ticket Assigned");
+    this.displayAssignDialog = false;
+    this.displayViewDialog = false;
+    assignForm.reset();
   }
 
   onAssignTicketDialog() {
@@ -203,19 +222,15 @@ export class TicketListComponent implements OnInit {
 
   }
 
-  onSelectedEmployee(): number {
-    console.log(this.selectedAssignee);
-    return this.selectedAssignee;
-  }
+  // onSelectedEmployee(): number {
+  //   console.log(this.selectedAssignee);
+  //   return this.selectedAssignee;
+  // }
 
-  onSelectedWatcher(): number[] {
-    console.log(this.selectedWatchers)
-    // let empNum = [];
-    // for (let i = 0; i < this.selectedWatchers.length; i++) {
-    //   empNum[i] = this.selectedWatchers[i].employeeNumber
-    // }
-    return this.selectedWatchers;
-  }
+  // onSelectedWatcher(): number[] {
+  //   console.log(this.selectedWatchers.map(Number));
+  //   return this.selectedWatchers.map(Number);
+  // }
 
   onClose(): void {
     this.displayEditDialog = false;
@@ -223,5 +238,6 @@ export class TicketListComponent implements OnInit {
     this.displayViewDialog = false;
   }
 
-  protected readonly JSON = JSON;
+  // protected readonly JSON = JSON;
+
 }

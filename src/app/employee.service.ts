@@ -51,7 +51,7 @@ export class EmployeeService {
       params = params.append('employeeNumber', watcher)
     }
     return this.http.put<Ticket>(
-      `/url/api/employees/add-watchers/${ticketNo}?${params}`, watchers
+      `/url/api/employees/add-watchers/${ticketNo}?`, watchers,  {params: params}
     );
   }
 
