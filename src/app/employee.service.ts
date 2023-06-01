@@ -9,49 +9,55 @@ import {Observable} from "rxjs";
 })
 export class EmployeeService {
 
+  url = "/url/api/employees"
   constructor(private http: HttpClient) {}
   getEmployee() {
     return this.http.get<Employee[]>(
-      '/url/api/employees/list'
+      `${this.url}/list`
     );
   }
   updateEmployee({employee}: { employee: any }) : Observable<Employee> {
     return this.http.put<Employee>(
-      `/url/api/employees/update/${employee.id}`, employee
+      `${this.url}/update/${employee.id}`, employee
     );
   }
   public deleteEmployee({ employee }: { employee: any }) : Observable<void>{
     return this.http.delete<void>(
-      `/url/api/employees/delete/${employee.id}`
+      `${this.url}/delete/${employee.id}`
     );
   }
 
   public createEmployee({ employee }: { employee: any }) : Observable<Employee> {
     return this.http.post<Employee>(
-      '/url/api/employees/create',
+      `${this.url}/create`,
       employee
     );
   }
 
   public viewEmployee({ employee }: { employee: any }) : Observable<Employee>{
     return this.http.get<Employee>(
-      `/url/api/employees/view/${employee.id}`
+      `${this.url}/view/${employee.id}`
     );
   }
 
   public assignTicketToEmployee(ticketNo: number, employeeId: any) : Observable<Ticket>{
     return this.http.put<Ticket>(
-      `/url/api/employees/assign-ticket/${ticketNo}?employeeNumber=${employeeId}`, employeeId
+      `${this.url}/assign-ticket/${ticketNo}?employeeNumber=${employeeId}`, employeeId
     );
   }
 
   public assignTicketWatchers(ticketNo: number,  watchers: any[] ) : Observable<Ticket>{
     let params = new HttpParams();
+    if (watchers === undefined || watchers === null){
+      return this.http.put<Ticket>(
+        `${this.url}/add-watchers/${ticketNo}?employeeNumber`, watchers
+      );
+    }
     for (const watcher of watchers){
       params = params.append('employeeNumber', watcher)
     }
     return this.http.put<Ticket>(
-      `/url/api/employees/add-watchers/${ticketNo}?`, watchers,  {params: params}
+      `${this.url}/add-watchers/${ticketNo}?`, watchers,  {params: params}
     );
   }
 

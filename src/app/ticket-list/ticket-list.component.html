@@ -17,8 +17,8 @@
       <th pSortableColumn="description" style="width:10%">Description<p-sortIcon field="description"></p-sortIcon></th>
       <th pSortableColumn="severity" style="width:10%">Severity<p-sortIcon field="severity"></p-sortIcon></th>
       <th pSortableColumn="status" style="width:10%">Status<p-sortIcon field="status"></p-sortIcon></th>
-      <th>Assignee</th>
-      <th>Watchers</th>
+      <th>Assignee (Employee #)</th>
+      <th>Watchers (Employee #)</th>
       <th>ACTIONS</th>
     </tr>
   </ng-template>
@@ -83,6 +83,7 @@
   [(visible)]="displayViewDialog"
   [breakpoints]="{'960px': '75vw', '640px': '100vw'}"
   [style]="{width: '50vw'}">
+  <form #viewForm="ngForm">
   <div class="ui-g ui-g-12 ui-g-nopad">
     <div class="ui-g-12 ui-md-3 ui-label">
       <label>Ticket Number: {{ticketViewDialog?.ticketNo}}</label>
@@ -121,10 +122,10 @@
       </ng-container>
     </div>
   </div>
-
+  </form>
   <p-footer>
     <div class="ui-dialog-buttonpane ui-helper-clearfix">
-      <button type="button" (click)="onClose()" pButton id="view-employee-form" icon="fa-check" data-dismiss="modal">
+      <button type="button" (click)="onClose(viewForm)" pButton id="view-employee-form" icon="fa-check" data-dismiss="modal">
         Close
       </button>
       <p-button
@@ -212,7 +213,7 @@
   </form>
     <p-footer>
       <div class="ui-dialog-buttonpane ui-helper-clearfix">
-        <button type="button" (click)="onClose()" pButton id="add-employee-form" icon="fa-check" data-dismiss="modal">
+        <button type="button" (click)="onClose(addForm)" pButton id="add-employee-form" icon="fa-check" data-dismiss="modal">
           Close
         </button>
         <button
@@ -314,7 +315,7 @@
   </form>
   <p-footer>
     <div class="ui-dialog-buttonpane ui-helper-clearfix">
-      <button type="button" (click)="onClose()" pButton id="edit-employee-form" icon="fa-check" data-dismiss="modal">
+      <button type="button" (click)="onClose(editForm)" pButton id="edit-employee-form" icon="fa-check" data-dismiss="modal">
         Close
       </button>
       <button
@@ -338,19 +339,16 @@
   [(visible)]="displayAssignDialog"
   [breakpoints]="{'960px': '75vw', '640px': '100vw'}"
   [style]="{width: '50vw'}">
-  <form #assignForm="ngForm">
+  <form #assignForm="ngForm" novalidate>
     <div class="card flex justify-content-center">
       <div class="flex flex-column gap-2">
         <label>Select an Assignee: </label><br>
-        <!--                  <p-dropdown [options]="tickets"-->
-        <!--                              [(ngModel)]="selectedTicket"-->
-        <!--                              placeholder="Select a City"-->
-        <!--                              optionLabel="tickets.ticketNo: tickets.title"-->
-        <!--                              ></p-dropdown>-->
         <select id="tickets" name="Assignee" [(ngModel)]="selectedAssignee"
-                 placeholder="Select">
-          <option>----Select-----</option>
-          <option *ngFor="let employees of employee" [value]="employees.employeeNumber">
+                 placeholder="Select"
+                dataKey="value"
+        >
+          <option value=0 selected disabled>Please select</option>
+          <option *ngFor="let employees of employee" [ngValue]="employees.employeeNumber">
             {{employees.firstName}} {{employees.lastName}}
           </option>
         </select><br><br>
@@ -359,9 +357,10 @@
         <div *ngFor="let employees of employee">
           <p-checkbox name="group" [value]="employees.employeeNumber.toString()"
                       [(ngModel)]="selectedWatchers"
-                      inputId="binary">
+                      inputId="binary"
+          (ngModelChange)="onSelectedWatcher(selectedWatchers)">
             {{employees.firstName}} {{employees.lastName}}</p-checkbox>
-          <label [for]="employees.employeeNumber">{{employees.firstName}} {{employees.lastName}}</label>
+          <label>{{employees.firstName}} {{employees.lastName}}</label>
         </div>
 
       </div>
@@ -369,13 +368,16 @@
   </form>
   <p-footer>
     <div class="ui-dialog-buttonpane ui-helper-clearfix">
+      <button type="button" (click)="onClose(assignForm)" pButton id="assign-ticket-form" icon="fa-check" data-dismiss="modal">
+        Close
+      </button>
       <button
-        (click)="onAssignTicket(employeeAssignDialog, selectedAssignee, selectedWatchers, assignForm)"
+        (click)="onAssignTicket(employeeAssignDialog, assignForm)"
         type="submit"
         pButton
         icon="fa-check"
         label="Confirm"
-        [disabled]="!assignForm.form.valid"
+        [disabled]="!selectedAssignee"
       ></button>
     </div>
   </p-footer>

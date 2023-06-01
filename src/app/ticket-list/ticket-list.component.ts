@@ -59,7 +59,7 @@ export class TicketListComponent implements OnInit {
     watchers: []
   }
 
-  selectedAssignee: number;
+  selectedAssignee: number=0;
   selectedWatchers?: number[];
   displayAssignDialog: boolean;
   employeeAssignDialog: Ticket = {
@@ -147,21 +147,6 @@ export class TicketListComponent implements OnInit {
       };
   }
 
-  // confirm(event: Event, ticket: Ticket) {
-  //   this.confirmationService.confirm({
-  //     target: event.target,
-  //     message: 'Are you sure that you want to proceed?',
-  //     icon: 'pi pi-exclamation-triangle',
-  //     accept: () => {
-  //       this.messageService.add({ severity: 'info', summary: 'Confirmed', detail: 'You have accepted' })
-  //       this.deleteTicket(ticket);
-  //     },
-  //     reject: () => {
-  //       this.messageService.add({ severity: 'error', summary: 'Rejected', detail: 'You have rejected' });
-  //     }
-  //   });
-  // }
-
   viewTicket(ticket: Ticket) {
     this.ticketService
       .viewTicket({ticket: ticket})
@@ -200,25 +185,36 @@ export class TicketListComponent implements OnInit {
       });
   }
 
-  onAssignTicket(ticket: Ticket, employeeId: number, watchers: any[], assignForm: NgForm) {
-    this.onAssignTicketToEmployee(ticket, employeeId);
-    this.employeeAssignDialog = this.ticketViewDialog;
-    if (watchers.length > 0) {
-      let newWatcher = watchers.map(Number);
+  onAssignTicket(ticket: Ticket, assignForm: NgForm) {
+
+    if (this.selectedWatchers === undefined || this.selectedWatchers === null) {
+      let emptyWatchers: number[];
+      this.onAssignWatchers(ticket, emptyWatchers);
+    } else {
+      let newWatcher = this.selectedWatchers.map(Number);
       this.onAssignWatchers(ticket, newWatcher);
     }
-    alert("Ticket Assigned");
+
+
+    if(this.selectedAssignee != null || this.selectedAssignee != undefined) {
+      this.onAssignTicketToEmployee(ticket, this.selectedAssignee);
+    }
+
+    this.employeeAssignDialog = this.ticketViewDialog;
     this.displayAssignDialog = false;
     this.displayViewDialog = false;
     assignForm.reset();
+    alert("Ticket Assigned");
+
   }
 
   onAssignTicketDialog() {
     this.ngOnInit();
     this.ngOnInitEmployee();
     this.displayAssignDialog = true;
+    this.displayViewDialog = false;
     this.employeeAssignDialog = this.ticketViewDialog;
-    console.log(this.employeeAssignDialog)
+    console.log(this.employeeAssignDialog.assignee)
 
   }
 
@@ -227,15 +223,20 @@ export class TicketListComponent implements OnInit {
   //   return this.selectedAssignee;
   // }
 
-  // onSelectedWatcher(): number[] {
-  //   console.log(this.selectedWatchers.map(Number));
-  //   return this.selectedWatchers.map(Number);
-  // }
+  onSelectedWatcher(newWatchers: number[]) : number[] {
+    if (this.selectedWatchers != null) {
+      newWatchers = this.selectedWatchers.map(Number);
+      console.log(newWatchers);
+    }
+    return newWatchers;
+  }
 
-  onClose(): void {
+  onClose(forms: NgForm): void {
+    this.displayAssignDialog = false;
     this.displayEditDialog = false;
     this.displayDialog = false;
     this.displayViewDialog = false;
+    forms.reset();
   }
 
   // protected readonly JSON = JSON;
